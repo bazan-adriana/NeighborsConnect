@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASHBOARD</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><span class="text-warning">Neighbors</span>Connect</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services"> </a>
+                    </li>
+                    <a class="nav-link" href="#home"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- contact section -->
+
+    <section id="contact" class="contact section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-header text-center pb-5">
+                        <h2 class="text-warning mt-5">Welcome {{logged_user.first_name}}</h2>
+                        <p>All Posts:
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <!-- {{all_posts}} -->
+                <table class="table">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Post</th>
+                            <th>Date</th>
+                            <th>This Month</th>
+                            <th>Address</th>
+                            <th>Posted By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for one_post in all_posts %}
+                        <tr>
+                            <td>{{one_post.name}}</td>
+                            <td>{{one_post.date.strftime('%m-%d-%Y')}}</td>
+                            <td>
+                                {% if one_post.currentmonth == 1 %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                            <td>{{one_post.address.street}} {{one_post.address.city}} {{one_post.address.state}}</td>
+                            <td>{{one_post.poster.first_name}}</td>
+                            <td>
+                                <a href="/posts/{{one_post.id}}">View Post</a>
+                                {% if one_post.user_id == session['user_id']%}
+                                <a href="/posts/{{one_post.id}}/edit">Edit</a>
+                                <a href="/posts/{{one_post.id}}/delete">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/posts/new" class="btn btn-warning">+Create</a>
+            </div>
+        </div>
+    </section>
+
+        <!-- footer -->
+
+    <footer class="bg-dark p-2 text-center">
+        <div class="container">
+            <p class="text-white">All Right Reserved @NeighborsConnect</p>
+        </div>
+    </footer>
+
+
+
+</body>
+
+</html>

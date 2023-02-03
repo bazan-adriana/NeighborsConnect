@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show One Post</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><span class="text-warning">Neighbors</span>Connect</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about"> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Back to Posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!--  section -->
+
+    <section id="contact" class="contact section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-header text-center pb-5">
+                        <h2 class="text-warning mt-5">POST </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+
+                <h3> {{this_post.name}}</h3>
+                <p>Posted By: {{this_post.poster.first_name}}</p>
+                <p>Description: {{this_post.descriptions}}</p>
+                <p>Comments: {{this_post.comments}}</p>
+                <p>Date Posted: {{this_post.date.strftime('%m-%d-%Y')}}</p>
+                <p>Current Month?
+                    {% if this_post.currentmonth == 1 %}
+                    Yes
+                    {% else %}
+                    No
+                    {% endif %}
+                </p>
+                <br>
+                <div>
+                    <p>Address:</p>
+                    <p>{{this_post.address.street}}</p>
+                    <p>{{this_post.address.city}}, {{this_post.address.state}}</p> 
+                    <br>
+                    <div id="map"></div>
+                    <script>
+                        let map;
+                        let service;
+                        let infowindow;
+
+                        function initMap() {
+                            const usa = new google.maps.LatLng(39.757, -101.390);
+
+                            infowindow = new google.maps.InfoWindow();
+                            map = new google.maps.Map(document.getElementById("map"), {
+                                center: usa,
+                                zoom: 15,
+                            });
+                            address = {{ this_post.address.street | tojson }} +", " + {{ this_post.address.city | tojson }} +", " + {{ this_post.address.state | tojson }}
+                        console.log(address)
+                        const request = {
+                            query: address,
+                            fields: ["formatted_address", "geometry"],
+                        };
+
+                        service = new google.maps.places.PlacesService(map);
+                        service.findPlaceFromQuery(request, (results, status) => {
+                            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                                for (let i = 0; i < results.length; i++) {
+                                    createMarker(results[i]);
+                                }
+
+                                map.setCenter(results[0].geometry.location);
+                            }
+                        });
+}
+
+                        function createMarker(place) {
+                            if (!place.geometry || !place.geometry.location) return;
+
+                            const marker = new google.maps.Marker({
+                                map,
+                                position: place.geometry.location,
+                            });
+
+                            google.maps.event.addListener(marker, "click", () => {
+                                infowindow.setContent(place.name || "");
+                                infowindow.open(map);
+                            });
+                        }
+
+                        window.initMap = initMap;
+                        google.maps.event.addDomListener(window, 'load', initialize)
+
+                    </script>
+                </div>
+    </section>
+
+    <!-- footer  -->
+
+    <footer class="bg-dark p-2 text-center">
+        <div class="container">
+            <p class="text-white">All Right Reserved @NeighborsConnect</p>
+        </div>
+    </footer>
+
+
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+    <script async src="https://maps.googleapis.com/maps/api/js?key={{api}}&libraries=places&callback=initMap">
+    </script>
+
+    <!-- <script async
+src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=initMap">
+</script> -->
+
+
+
+</body>
+
+</html>
